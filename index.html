@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>單身聯誼活動報名</title>
+  <style>
+    body { font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; background: #f7f9fc; padding: 20px; }
+    .form-container { max-width: 500px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    h2 { text-align: center; color: #ff5a5f; margin-bottom: 25px; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; color: #333; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+    input:focus, select:focus { border-color: #ff5a5f; outline: none; }
+    .btn-submit { width: 100%; padding: 12px; background: #ff5a5f; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; }
+    .btn-submit:hover { background: #e0484c; }
+    .msg { margin-top: 15px; text-align: center; font-weight: bold; color: #28a745; }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>單身聯誼活動報名表</h2>
+  <form id="signup-form">
+    <div class="form-group">
+      <label for="name">姓名 *</label>
+      <input type="text" id="name" required placeholder="請輸入姓名">
+    </div>
+
+    <div class="form-group">
+      <label for="gender">性別 *</label>
+      <select id="gender" required>
+        <option value="">-- 請選擇 --</option>
+        <option value="男">男 (紳士)</option>
+        <option value="女">女 (淑女)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="phone">聯絡電話 *</label>
+      <input type="tel" id="phone" required placeholder="0912345678" pattern="09\d{8}">
+    </div>
+
+    <div class="form-group">
+      <label for="birthday">生日 *</label>
+      <input type="date" id="birthday" required>
+    </div>
+
+    <div class="form-group">
+      <label for="job">職業 *</label>
+      <input type="text" id="job" required placeholder="例如：工程師、教師、金融業">
+    </div>
+
+    <div class="form-group">
+      <label for="contact">Line ID 或 Email *</label>
+      <input type="text" id="contact" required placeholder="請輸入 Line ID 或 Email">
+    </div>
+
+    <button type="submit" class="btn-submit" id="submit-btn">立即送出報名</button>
+    <div class="msg" id="msg"></div>
+  </form>
+</div>
+
+<script>
+  // 請替換為您部署好的 Google Apps Script Web App URL
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbyNs7OmGYQ8AX_-4hMWT6HYAwGqPuxdynyedgQpr6rA4NXIwFjy9OCKsr-_8KPu9AnYTw/exec';
+
+  document.getElementById('signup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const submitBtn = document.getElementById('submit-btn');
+    const msg = document.getElementById('msg');
+
+    submitBtn.disabled = true;
+    submitBtn.innerText = '資料送出中...';
+    msg.innerText = '';
+
+    // 收集表單資料
+    const formData = {
+      name: document.getElementById('name').value,
+      gender: document.getElementById('gender').value,
+      phone: document.getElementById('phone').value,
+      birthday: document.getElementById('birthday').value,
+      job: document.getElementById('job').value,
+      contact: document.getElementById('contact').value
+    };
+
+    // 使用 JS fetch 將資料 post 給 Google Apps Script 寫入試算表
+    fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors', // 避免跨域阻擋
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    })
+    .then(() => {
+      msg.innerText = '🎉 報名成功！我們會儘速與您聯絡。';
+      document.getElementById('signup-form').reset();
+      submitBtn.disabled = false;
+      submitBtn.innerText = '立即送出報名';
+    })
+    .catch(error => {
+      msg.style.color = 'red';
+      msg.innerText = '報名失敗，請稍後再試！';
+      console.error(error);
+      submitBtn.disabled = false;
+      submitBtn.innerText = '立即送出報名';
+    });
+  });
+</script>
+
+</body>
+</html>
